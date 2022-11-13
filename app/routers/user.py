@@ -13,13 +13,14 @@ router = APIRouter(
 
 
 @router.get("/")
-def user():
-    return {"Some": "user stuff"}
+def user(db: Session = Depends(get_db)):
+    return db.query(models.User).all()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_user():
     return {"Some": "user info"}
+
 
 # FOR VANYA
 @router.get("/{id}{znak}{id2}")
