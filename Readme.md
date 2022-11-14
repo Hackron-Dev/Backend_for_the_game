@@ -1,5 +1,4 @@
 # Create backend for the game 
-___
 ### Using Fastapi
 ___
 ### settings for usage
