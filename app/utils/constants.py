@@ -18,12 +18,12 @@ def _int_config(searching_path: int, *args, **kwargs) -> int:
 class Connection:
     """Config connection to database"""
 
-    SQLALCHEMY_DATABASE_URL = _str_config("SQLALCHEMY_DATABASE_URL")
+    DATABASE_URL = _str_config("DATABASE_URL")
 
 
 class Server:
     """Config related to the API server itself"""
 
-    # SECRET_KEY = _str_config("SECRET_KEY")
-    # ALGORITHM = _str_config("ALGORITHM")
-    # ACCESS_TOKEN_EXPIRE_MINUTES = _int_config("ACCESS_TOKEN_EXPIRE_MINUTES")
+    SECRET_KEY = _str_config("SECRET_KEY")
+    ALGORITHM = _str_config("ALGORITHM")
+    ACCESS_TOKEN_EXPIRE_MINUTES = _int_config("ACCESS_TOKEN_EXPIRE_MINUTES")

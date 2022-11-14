@@ -2,16 +2,19 @@ from fastapi import FastAPI
 
 from app import models
 from app.db.database import engine
-from app.routers import user, scores
+from app.routers import user, scores, auth
+
 
 # for create table on db
 models.Base.metadata.create_all(bind=engine)
 
+
 app = FastAPI()
+
 # two router for two url paths
 app.include_router(user.router)  # users router
 app.include_router(scores.router)  # scores router
-
+app.include_router(auth.router)  # auth router
 
 # just for test
 @app.get("/")

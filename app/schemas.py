@@ -18,7 +18,11 @@ class UserLogin(BaseModel):
     password: str
 
 
-class Score(BaseModel):
-    id_user: int
+class ScoreOut(BaseModel):
+    id: int = Field(alias="id_user")
     score: int
     create_at: datetime
+
+
+class Score(BaseModel):
+    score: int

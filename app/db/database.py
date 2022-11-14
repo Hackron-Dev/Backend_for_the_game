@@ -14,10 +14,11 @@ def get_db():
 
 
 # URL for connection to db
-SQLALCHEMY_DATABASE_URL = f'postgresql://{Connection.SQLALCHEMY_DATABASE_URL}'
+DATABASE_URL = f'postgresql://{Connection.DATABASE_URL}'
+# DATABASE_URL = "sqlite:///./db.sqlite3"
 
 # Create engine
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(DATABASE_URL)
 
 # Create session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

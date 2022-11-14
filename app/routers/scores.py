@@ -1,8 +1,9 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app import schemas
 from app import models
+from app.db.database import get_db
 
 # initialize router settings
 router = APIRouter(
@@ -18,6 +19,6 @@ def get_scores(db: Session = Depends(get_db)):
 
 
 # Post score  TODO: depends on user
-@router.post("/", status_code=status.HTTP_201_CREATED)
-def create_scores(db: Session = Depends(get_db)):
-    return {"SUCSECC": "created"}
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ScoreOut)
+def create_scores(score: schemas.Score, db: Session = Depends(get_db)):
+    pass

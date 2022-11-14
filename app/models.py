@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey  # Columns settings
 from sqlalchemy.sql.sqltypes import TIMESTAMP  # for automatically adding local time
 from sqlalchemy.sql.expression import text
+from sqlalchemy.orm import relationship  # for creating relationships between tables
 
 from app.db.database import Base  # Class to create table
 
@@ -14,6 +15,8 @@ class User(Base):
     password: str = Column(String, nullable=False)
     admin: bool = Column(Boolean, server_default=text('False'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+    owner = relationship("Score")  # relationship with scores table
 
 
 # Scores table
