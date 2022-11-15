@@ -1,19 +1,13 @@
 from fastapi import FastAPI
 
-from app import models
-from app.db.database import engine
-from app.routers import user, scores
+from app.db.database import metadata, engine
+from app.routers import users
+app = FastAPI()#
 
-# for create table on db
-models.Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-# two router for two url paths
-app.include_router(user.router)  # users router
-app.include_router(scores.router)  # scores router
+metadata.create_all(engine)
+# Сделать запрос о добавление  user Done
+# Сделать запрос о получение  user score
+# Сделать запрос о редактирование cash user
 
 
-# just for test
-@app.get("/")
-def main_page():
-    return {"Hello": "world"}
+app.include_router(users.router)  # users router
