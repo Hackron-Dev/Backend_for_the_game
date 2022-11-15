@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 
-from app.db.database import metadata, engine
+from app.db.database import Base, engine
 from app.routers import users
-app = FastAPI()#
 
-metadata.create_all(engine)
+app = FastAPI()
+
+Base.metadata.create_all(engine)
 # Сделать запрос о добавление  user Done
 # Сделать запрос о получение  user score
 # Сделать запрос о редактирование cash user

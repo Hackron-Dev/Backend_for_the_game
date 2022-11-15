@@ -1,7 +1,16 @@
 from pydantic import BaseModel
 
 
-class User_(BaseModel):
-    Login_: str
-    Password_: str
-    score_: int = 0
+class CreateUser(BaseModel):
+    login: str
+    password: str
+    mcoin: int
+    rcoin: int
+
+
+class LoginUser(BaseModel):
+    login: str
+    password: str
+
+    class Config:
+        orm_mode = True

@@ -1,10 +1,10 @@
 import hashlib
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-from app.db.database import conn
-from app.models import users
-from app.schemas import User_
+from app import schemas, models
+from app.db.database import get_db
 
 router = APIRouter(
     prefix="/users",
@@ -18,34 +18,38 @@ async def root():
 
 
 @router.post("/register")
-async def create_user(user: User_):
-    check_register = conn.execute(users.select().where(users.c.Login == user.Login_)).fetchone()
-    hash_password = hashlib.md5(user.Password_.encode()).hexdigest()
-    if check_register:
-        return {"message": "User already exist"}
-    else:
-        insLogin = users.insert().values(Login=user.Login_, Hash_Password=hash_password)
-        conn.execute(insLogin)
-        return {"message": "User created"}
+async def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
+    hash_password = hashlib.md5(user.password.encode()).hexdigest()
+    user.password = hash_password
+    try:
+        new_user = models.Users(**user.dict())
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        return new_user
+
+    except Exception as ex:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This login already have been used")
 
 
-@router.post("/login")
-async def create_user(user: User_):
-    check_login = conn.execute(users.select().where(users.c.Login == user.Login_)).fetchone()
-    hash_password = hashlib.md5(user.Password_.encode()).hexdigest()
+@router.post("/login", response_model=schemas.LoginUser)
+def create_user(user: schemas.LoginUser, db: Session = Depends(get_db)):
+    check_login = db.query(models.Users).filter(models.Users.login == user.login).first()
+    hash_password = hashlib.md5(user.password.encode()).hexdigest()
     if check_login:
-        if check_login.Hash_Password == hash_password:
-            return {"message": "Login success"}
+        if check_login.password == hash_password:
+            return check_login
         else:
-            return {"message": "Wrong password"}
+            return {"Login or password is not correct"}
     else:
         return {"message": "User not found"}
 
 
-@router.get("/get_score/{Login}")
-async def get_user_score(Login: str):
-    check_login = conn.execute(users.select().where(users.c.Login == Login)).fetchone()
+@router.get("/get_score/{login}")
+async def get_user_score(login: str, db: Session = Depends(get_db)):
+    check_login = db.query(models.Users).filter(models.Users.login == login).first()
     if check_login:
-        return {"message": Login, "score": check_login.Score}
+        return {"message": login, "Mcoin": check_login.mcoin, "Rcoin": check_login.rcoin}
     else:
         return {"message": "User does not exist"}
