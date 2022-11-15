@@ -1,9 +1,7 @@
-from app import oauth2
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 
-from app import schemas
-from app import models
+from app import schemas, oauth2, models
 from app.db.database import get_db
 
 # initialize router settings

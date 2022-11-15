@@ -16,8 +16,6 @@ class User(Base):
     admin: bool = Column(Boolean, server_default=text('False'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
-    owner = relationship("Score")  # relationship with scores table
-
 
 # Scores table
 class Score(Base):
@@ -28,3 +26,4 @@ class Score(Base):
     score: int = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
+    owner = relationship("Score")  # relationship with scores table
