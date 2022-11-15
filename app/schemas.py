@@ -24,5 +24,9 @@ class ScoreOut(BaseModel):
     create_at: datetime
 
 
-class Score(BaseModel):
+class CreateScore(BaseModel):
     score: int
+
+
+class TokenData(BaseModel):
+    id: Optional[str] = None

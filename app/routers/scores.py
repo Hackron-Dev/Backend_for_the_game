@@ -1,3 +1,4 @@
+from app import oauth2
 from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 
@@ -18,7 +19,13 @@ def get_scores(db: Session = Depends(get_db)):
     return db.query(models.Score).all()
 
 
-# Post score  TODO: depends on user
+# Post score
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ScoreOut)
-def create_scores(score: schemas.Score, db: Session = Depends(get_db)):
-    pass
+def create_scores(score: schemas.CreateScore, db: Session = Depends(get_db), current_user: int = Depends(oauth2)):
+    new_score = models.Score(id_user=current_user.id, **score.dict())  # adding score by users id
+
+    db.add(new_score)
+    db.commit()
+    db.refresh(new_score)
+
+    return new_score
