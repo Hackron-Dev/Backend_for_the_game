@@ -19,7 +19,9 @@ def get_scores(db: Session = Depends(get_db)):
 
 # Post score
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ScoreOut)
-def create_scores(score: schemas.CreateScore, db: Session = Depends(get_db), current_user: int = Depends(oauth2)):
+def create_scores(score: schemas.CreateScore, db: Session = Depends(get_db), current_user: int = Depends(
+    oauth2.get_current_user
+)):
     new_score = models.Score(id_user=current_user.id, **score.dict())  # adding score by users id
 
     db.add(new_score)

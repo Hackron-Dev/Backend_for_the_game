@@ -10,7 +10,7 @@ from app import schemas, models
 from app.db import database
 from app.utils.constants import Server
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # i don't know but need for using
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # I don't know but need for using
 
 
 def create_access_token(data: dict):  # creating token
