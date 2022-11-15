@@ -12,3 +12,9 @@ example `SQLALCHEMY_DATABASE_URL="postgres:0030@localhost:5432/gamefor"`
 
 ### for running use pycharm or command 
 `uvicorn app.main:app --host=localhost --port=8080`
+
+___
+### Project Contributors
+<a href="https://github.com/Hackron-Dev/Backend_for_the_game/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=Hackron-dev/Backend_for_the_game">
+</a>
