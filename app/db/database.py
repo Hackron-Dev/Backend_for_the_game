@@ -11,7 +11,7 @@ def get_db():
         db.close()
 
 
-DATABASE_URL = 'sqlite:///users.db'
+DATABASE_URL = 'postgres://postgres:1234@localhost:5432/forgame'
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 

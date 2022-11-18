@@ -1,7 +1,9 @@
 from typing import List
 
+from app.db.database import DATABASE_URL
+
 from fastapi import FastAPI, HTTPException
-from models import Users, User_Pydantic, UserIn_Pydantic
+from app_v2.models import Users, User_Pydantic, UserIn_Pydantic
 from pydantic import BaseModel
 
 from tortoise.contrib.fastapi import HTTPNotFoundError, register_tortoise
@@ -49,7 +51,7 @@ async def delete_user(user_id: int):
 
 register_tortoise(
     app,
-    db_url="sqlite://:memory:",
+    db_url=DATABASE_URL,
     modules={"models": ["models"]},
     generate_schemas=True,
     add_exception_handlers=True,
