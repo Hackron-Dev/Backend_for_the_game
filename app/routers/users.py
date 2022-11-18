@@ -46,6 +46,7 @@ def create_user(user: schemas.LoginUser, db: Session = Depends(get_db)):
         return {"message": "User not found"}
 
 
+# TODO: add update user score
 @router.get("/get_score/{login}")
 async def get_user_score(login: str, db: Session = Depends(get_db)):
     check_login = db.query(models.Users).filter(models.Users.login == login).first()
