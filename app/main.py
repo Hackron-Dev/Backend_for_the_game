@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 
-from app.db.database import Base, engine
 from app.routers import users
+from app.db.database import init_db
 
-app = FastAPI()
+from tortoise.contrib.fastapi import register_tortoise
 
-Base.metadata.create_all(engine)
-# Сделать запрос о добавление  user Done
-# Сделать запрос о получение  user score
-# Сделать запрос о редактирование cash user
+app = FastAPI(title="TESTETSETSE")
+
+app.include_router(users.router)
 
 
-app.include_router(users.router)  # users router
+@app.on_event("startup")
+async def startup_event():
+    init_db(app)

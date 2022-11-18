@@ -1,56 +1,48 @@
-import hashlib
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel
 
-from app import schemas, models
-from app.db.database import get_db
+from app.models import Users, User_Pydantic, UserIn_Pydantic
+from app.utils import jwt_utils
 
 router = APIRouter(
-    prefix="/users",
-    tags=['Users']
+    tags=["Users"],
+    prefix="/users"
 )
 
 
-@router.get("/")
-async def root():
-    return {"message": "Hello World"}
+@router.get("/", response_model=List[User_Pydantic])  # Get All users
+async def get_users():
+    return await User_Pydantic.from_queryset(Users.all())
 
 
-@router.post("/register")
-async def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
-    hash_password = hashlib.md5(user.password.encode()).hexdigest()
-    user.password = hash_password
-    try:
-        new_user = models.Users(**user.dict())
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-
-        return new_user
-
-    except Exception as ex:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This login already have been used")
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_Pydantic)  # Create user
+async def create_user(user: UserIn_Pydantic):
+    user.password = jwt_utils.hash_(user.password)  # hashing password
+    user_obj = await Users.create(**user.dict())
+    return await User_Pydantic.from_tortoise_orm(user_obj)
 
 
-@router.post("/login", response_model=schemas.LoginUser)
-def create_user(user: schemas.LoginUser, db: Session = Depends(get_db)):
-    check_login = db.query(models.Users).filter(models.Users.login == user.login).first()
-    hash_password = hashlib.md5(user.password.encode()).hexdigest()
-    if check_login:
-        if check_login.password == hash_password:
-            return check_login
-        else:
-            return {"Login or password is not correct"}
-    else:
-        return {"message": "User not found"}
+@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=User_Pydantic)  # Get user by id
+async def get_user_by_id(user_id: int):
+    return await User_Pydantic.from_queryset_single(Users.get(id=user_id))
 
 
-# TODO: add update user score
-@router.get("/get_score/{login}")
-async def get_user_score(login: str, db: Session = Depends(get_db)):
-    check_login = db.query(models.Users).filter(models.Users.login == login).first()
-    if check_login:
-        return {"message": login, "Mcoin": check_login.mcoin, "Rcoin": check_login.rcoin}
-    else:
-        return {"message": "User does not exist"}
+@router.put("/{user_id}", status_code=status.HTTP_426_UPGRADE_REQUIRED, response_model=User_Pydantic)  # Update user
+async def update_user(user_id: int, user: UserIn_Pydantic):
+    user.password = jwt_utils.hash_(user.password)
+    await Users.filter(id=user_id).update(**user.dict())
+    return await User_Pydantic.from_queryset_single(Users.get(id=user_id))
+
+
+class Status(BaseModel):  # Status msg for errors
+    message: str
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=Status)  # Delete user
+async def delete_user(user_id: int):
+    deleted_count = await Users.filter(id=user_id).delete()
+    if not deleted_count:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return Status(message=f"Deleted user {user_id}")

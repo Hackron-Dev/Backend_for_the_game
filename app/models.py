@@ -1,13 +1,24 @@
-from sqlalchemy import Table, Column, String, Integer
+from tortoise import fields
+from tortoise.models import Model
+from tortoise.contrib.pydantic import pydantic_model_creator
 
-from app.db.database import Base
+
+class Users(Model):
+    """
+    The User model
+    """
+
+    id = fields.IntField(pk=True, unique=True)
+    login = fields.CharField(max_length=50, null=False)
+    password = fields.CharField(max_length=128, null=False)
+    mcoin = fields.IntField(null=False)
+    rcoin = fields.IntField(null=False)
 
 
-class Users(Base):
-    __tablename__ = "users"
+# Pydantic schemas created automatically
+User_Pydantic = pydantic_model_creator(Users, name="User")
+UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=True)
 
-    id: int = Column(Integer, primary_key=True, nullable=False)
-    login: str = Column(String, nullable=False, unique=True)
-    password: str = Column(String, nullable=False)
-    mcoin: int = Column(Integer, default=0)
-    rcoin: int = Column(Integer, default=0)
+
+class Shop(Model):
+    pass

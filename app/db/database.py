@@ -1,20 +1,19 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from fastapi import FastAPI
+
+from tortoise import Tortoise
+from tortoise.contrib.fastapi import register_tortoise
+
+from app.utils.constants import Connection
+
+DATABASE_URL = f'postgres://{Connection.DATABASE_URL}'
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-DATABASE_URL = 'postgres://postgres:1234@localhost:5432/forgame'
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
+def init_db(app: FastAPI) -> None:
+    Tortoise.init_models(["app.models"], "models")
+    register_tortoise(
+        app,
+        db_url=DATABASE_URL,
+        modules={'models': ['app.models']},
+        generate_schemas=True,
+        add_exception_handlers=True
+    )
