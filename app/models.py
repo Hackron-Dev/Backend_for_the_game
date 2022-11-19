@@ -26,7 +26,7 @@ class Shop(Model):
     name = fields.CharField(max_length=50, null=False)
     description = fields.CharField(max_length=200, null=True)
     price = fields.IntField(null=False)
-    image = fields.CharField(max_length=200, null=True)
+    image = fields.CharField(max_length=200, null=True)  # image | CharField?
     quantity = fields.IntField(null=True)  # quantity of product
 
 
