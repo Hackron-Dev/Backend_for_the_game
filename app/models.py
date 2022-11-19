@@ -15,7 +15,7 @@ class Users(Model):
     rcoin = fields.IntField(null=False)
 
 
-# Pydantic schemas created automatically
+# Pydantic schemas creating automatically by Tortoise
 User_Pydantic = pydantic_model_creator(Users, name="User")
 UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=True)
 
