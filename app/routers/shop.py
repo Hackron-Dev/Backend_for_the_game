@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.models import Shop, Shop_Pydantic, ShopIn_Pydantic
-# from app.models import Users, User_Pydantic  # why do you need this?
 from pydantic import BaseModel
 
 router = APIRouter(

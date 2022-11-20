@@ -9,9 +9,10 @@ class Users(Model):
     """
 
     id = fields.IntField(pk=True, unique=True)
-    login = fields.CharField(max_length=50, null=False)
+    login = fields.CharField(max_length=50, null=False, unique=True)
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
+    id_admin = fields.BooleanField(null=False, default=False)
 
 
 # Pydantic schemas creating automatically by Tortoise
@@ -19,7 +20,7 @@ User_Pydantic = pydantic_model_creator(Users, name="User")
 UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=True)
 
 
-# Class for the shop (9:36)
+# Class for the shop (9:36) TODO create foreign key for shop to users
 class Shop(Model):
     id = fields.IntField(pk=True, unique=True)
     name = fields.CharField(max_length=50, null=False)
