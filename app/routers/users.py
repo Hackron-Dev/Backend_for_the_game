@@ -12,7 +12,20 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[User_Pydantic])  # Get All users
+# region: Pydantic schemas
+class Status(BaseModel):  # Status msg for errors
+    message: str
+
+
+class UserOut(BaseModel):
+    id: int
+    login: str
+    balance: str
+
+
+# endregion
+
+@router.get("/", response_model=List[UserOut])  # Get All users
 async def get_users():
     return await User_Pydantic.from_queryset(Users.all())
 
@@ -34,10 +47,6 @@ async def update_user(user_id: int, user: UserIn_Pydantic):
     user.password = jwt_utils.hash_(user.password)
     await Users.filter(id=user_id).update(**user.dict())
     return await User_Pydantic.from_queryset_single(Users.get(id=user_id))
-
-
-class Status(BaseModel):  # Status msg for errors
-    message: str
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=Status)  # Delete user

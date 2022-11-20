@@ -11,8 +11,7 @@ class Users(Model):
     id = fields.IntField(pk=True, unique=True)
     login = fields.CharField(max_length=50, null=False)
     password = fields.CharField(max_length=128, null=False)
-    mcoin = fields.IntField(null=False)
-    rcoin = fields.IntField(null=False)
+    balance = fields.IntField(null=False, default=0)
 
 
 # Pydantic schemas creating automatically by Tortoise
