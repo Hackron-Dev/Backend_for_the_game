@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from app.models import Users, User_Pydantic, UserIn_Pydantic
 from app.utils import jwt_utils
+from app.schemas import UserOut, Status
 
 router = APIRouter(
     tags=["Users"],
@@ -12,29 +13,9 @@ router = APIRouter(
 )
 
 
-# region: Pydantic schemas
-class Status(BaseModel):  # Status msg for errors
-    message: str
-
-
-class UserOut(BaseModel):
-    id: int
-    login: str
-    balance: str
-
-
-# endregion
-
 @router.get("/", response_model=List[UserOut])  # Get All users
 async def get_users():
     return await User_Pydantic.from_queryset(Users.all())
-
-
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_Pydantic)  # Create user
-async def create_user(user: UserIn_Pydantic):
-    user.password = jwt_utils.hash_(user.password)  # hashing password
-    user_obj = await Users.create(**user.dict())
-    return await User_Pydantic.from_tortoise_orm(user_obj)
 
 
 @router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=User_Pydantic)  # Get user by id
