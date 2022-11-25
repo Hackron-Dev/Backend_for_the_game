@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+import tortoise
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from starlette import status
 
 from app import oauth2
 from app.models import User_Pydantic, UserIn_Pydantic, Users
@@ -10,12 +10,17 @@ from app.schemas import UserOut, Token
 router = APIRouter(
     tags=['Auth']
 )
+user_router = APIRouter(dependencies=[Depends(oauth2.JWTBearer())])
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
-async def create_user(user: UserIn_Pydantic):
+@user_router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
+async def create_user(user: UserIn_Pydantic, is_admin: bool = False):
     user.password = jwt_utils.hash_(user.password)  # hashing password
-    user_obj = await Users.create(**user.dict())
+    user.id_admin = is_admin
+    try:
+        user_obj = await Users.create(**user.dict())
+    except tortoise.exceptions.OperationalError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User with this login already exist")
     return await User_Pydantic.from_tortoise_orm(user_obj)
 
 
@@ -30,6 +35,6 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/admin")
+@user_router.get("/admin")
 async def root():
-    pass
+    return "You are admin"

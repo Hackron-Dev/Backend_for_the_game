@@ -12,7 +12,7 @@ class Users(Model):
     login = fields.CharField(max_length=50, null=False, unique=True)
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
-    id_admin = fields.BooleanField(null=False, default=False)
+    id_admin = fields.BooleanField(null=False, default=False)  # TODO: change id_admin to is_admin
 
 
 # Pydantic schemas creating automatically by Tortoise

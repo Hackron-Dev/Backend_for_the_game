@@ -12,6 +12,9 @@ class UserOut(BaseModel):
     login: str
     balance: str
 
+    class Config:
+        orm_mode = True
+
 
 class Token(BaseModel):
     access_token: str
