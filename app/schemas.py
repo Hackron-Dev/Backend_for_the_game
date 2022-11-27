@@ -1,31 +1,24 @@
 from typing import Optional
-from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+
+class Status(BaseModel):  # Status msg for errors
+    message: str
 
 
 class UserOut(BaseModel):
-    id: int = Field(alias="id_user")  # для того чтобы читать как id_user и писать как id
+    id: int
     login: str
-    create_date = datetime
+    balance: str
 
     class Config:
         orm_mode = True
 
 
-class UserLogin(BaseModel):
-    login: str
-    password: str
-
-
-class ScoreOut(BaseModel):
-    id: int = Field(alias="id_user")
-    score: int
-    create_at: datetime
-
-
-class CreateScore(BaseModel):
-    score: int
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 class TokenData(BaseModel):

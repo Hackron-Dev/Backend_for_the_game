@@ -1,24 +1,43 @@
-from fastapi import APIRouter, status, HTTPException, Depends, Response
-from sqlalchemy.orm import Session
+import tortoise
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from app.db import database
-from app import models, schemas, oauth2
+from app import oauth2
+from app.models import User_Pydantic, UserIn_Pydantic, Users
 from app.utils import jwt_utils
+from app.schemas import UserOut, Token
 
 router = APIRouter(
-    tags=['Authentications']
+    tags=['Auth']
+)
+user_router = APIRouter(
+    tags=['Auth'],
+    dependencies=[Depends(oauth2.JWTBearer())]
 )
 
 
-@router.post("/login", status_code=status.HTTP_200_OK)
-def login(user_credentials: schemas.UserLogin, db: Session = Depends(database.get_db)):
-    user = db.query(models.User).filter(models.User.login == user_credentials.login).first()
+@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
+async def create_user(user: UserIn_Pydantic, is_admin: bool = False):
+    user.password = jwt_utils.hash_(user.password)  # hashing password
+    user.is_admin = is_admin
+    try:
+        user_obj = await Users.create(**user.dict())
+    except tortoise.exceptions.OperationalError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User with this login already exist")
+    return await User_Pydantic.from_tortoise_orm(user_obj)
 
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials")
-    if not jwt_utils.verify(user_credentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials")
 
-    access_token = oauth2.create_access_token(data={"user_id": user.id_user})
+@router.post("/login", response_model=Token)
+async def login(user: OAuth2PasswordRequestForm = Depends()):
+    users = await User_Pydantic.from_queryset_single(Users.get(login=user.username))
 
+    if not jwt_utils.verify(user.password, users.password):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
+
+    access_token = oauth2.create_token(data={"current_user": users.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@user_router.get("/admin")
+async def root():
+    return "You are admin"

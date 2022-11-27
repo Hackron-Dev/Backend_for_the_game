@@ -3,14 +3,13 @@
 *.log
 *.pot
 *.pyc
-test.py
 __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+app/test.py
 *.db
-
 .DS_Store
 node_modules
 /dist

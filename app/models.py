@@ -1,29 +1,36 @@
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey  # Columns settings
-from sqlalchemy.sql.sqltypes import TIMESTAMP  # for automatically adding local time
-from sqlalchemy.sql.expression import text
-from sqlalchemy.orm import relationship  # for creating relationships between tables
-
-from app.db.database import Base  # Class to create table
+from tortoise import fields
+from tortoise.models import Model
+from tortoise.contrib.pydantic import pydantic_model_creator
 
 
-# Users table
-class User(Base):
-    __tablename__ = 'users'  # just tablename
+class Users(Model):
+    """ The User model"""
 
-    id_user: int = Column(Integer, primary_key=True, nullable=False)
-    login: str = Column(String, nullable=False, unique=True)
-    password: str = Column(String, nullable=False)
-    admin: bool = Column(Boolean, server_default=text('False'))
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    id = fields.IntField(pk=True, unique=True)
+    login = fields.CharField(max_length=50, null=False, unique=True)
+    password = fields.CharField(max_length=128, null=False)
+    balance = fields.IntField(null=False, default=0)
+    is_admin = fields.BooleanField(null=False, default=False)
 
 
-# Scores table
-class Score(Base):
-    __tablename__ = 'scores'
+# Pydantic schemas creating automatically by Tortoise
+User_Pydantic = pydantic_model_creator(Users, name="User")
+UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=True)
 
-    id_score: int = Column(Integer, primary_key=True, nullable=False)
-    id_user: int = Column(Integer, ForeignKey('users.id_user', ondelete='CASCADE'), nullable=False)
-    score: int = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
-    owner = relationship("Score")  # relationship with scores table
+# Class for the shop (9:36) TODO create foreign key for shop to users
+class Shop(Model):
+    """Shops Model"""
+
+    id = fields.IntField(pk=True, unique=True)
+    user = fields.ForeignKeyField('models.Users', related_name='shop')  # user_id in db, relate to User
+    name = fields.CharField(max_length=50, null=False)
+    description = fields.CharField(max_length=200, null=True)
+    price = fields.IntField(null=False)
+    image = fields.CharField(max_length=200, null=True)
+    quantity = fields.IntField(null=True)  # quantity of product
+
+
+# Pydantic schemas created automatically by [Copilot]
+Shop_Pydantic = pydantic_model_creator(Shop, name="Shop")
+ShopIn_Pydantic = pydantic_model_creator(Shop, name="ShopIn", exclude_readonly=True)
