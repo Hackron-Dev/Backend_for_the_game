@@ -10,13 +10,16 @@ from app.schemas import UserOut, Token
 router = APIRouter(
     tags=['Auth']
 )
-user_router = APIRouter(dependencies=[Depends(oauth2.JWTBearer())])
+user_router = APIRouter(
+    tags=['Auth'],
+    dependencies=[Depends(oauth2.JWTBearer())]
+)
 
 
-@user_router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
+@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
 async def create_user(user: UserIn_Pydantic, is_admin: bool = False):
     user.password = jwt_utils.hash_(user.password)  # hashing password
-    user.id_admin = is_admin
+    user.is_admin = is_admin
     try:
         user_obj = await Users.create(**user.dict())
     except tortoise.exceptions.OperationalError as e:

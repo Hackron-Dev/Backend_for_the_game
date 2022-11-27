@@ -4,15 +4,13 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class Users(Model):
-    """
-    The User model
-    """
+    """ The User model"""
 
     id = fields.IntField(pk=True, unique=True)
     login = fields.CharField(max_length=50, null=False, unique=True)
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
-    id_admin = fields.BooleanField(null=False, default=False)  # TODO: change id_admin to is_admin
+    is_admin = fields.BooleanField(null=False, default=False)
 
 
 # Pydantic schemas creating automatically by Tortoise
@@ -22,11 +20,14 @@ UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=
 
 # Class for the shop (9:36) TODO create foreign key for shop to users
 class Shop(Model):
+    """Shops Model"""
+
     id = fields.IntField(pk=True, unique=True)
+    user = fields.ForeignKeyField('models.Users', related_name='shop')  # user_id in db, relate to User
     name = fields.CharField(max_length=50, null=False)
     description = fields.CharField(max_length=200, null=True)
     price = fields.IntField(null=False)
-    image = fields.CharField(max_length=200, null=True)  # image | CharField?
+    image = fields.CharField(max_length=200, null=True)
     quantity = fields.IntField(null=True)  # quantity of product
 
 

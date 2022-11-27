@@ -38,7 +38,7 @@ async def validate_token(token: Optional[str], needs_admin: bool = False) -> tup
 
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    if needs_admin and not member.id_admin:
+    if needs_admin and not member.is_admin:
         return HTTPException(403, AuthState.NEEDS_ADMIN.value)
 
     return token_data, member
