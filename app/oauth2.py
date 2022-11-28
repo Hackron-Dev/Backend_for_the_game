@@ -6,6 +6,7 @@ from typing import Optional, cast
 from enum import Enum
 
 from app import schemas
+from app.utils import jwt_utils
 from app.utils.constants import Server
 from app.utils.jwt_utils import get_user
 from app.models import User_Pydantic, Users
@@ -38,7 +39,7 @@ async def validate_token(token: Optional[str], needs_admin: bool = False) -> tup
 
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    if needs_admin and not member.is_admin:
+    if needs_admin and not member:
         return HTTPException(403, AuthState.NEEDS_ADMIN.value)
 
     return token_data, member
@@ -95,3 +96,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     token = verify_access_token(token, credentials_exceptions)
     user = User_Pydantic.from_queryset_single(Users.get(id=token.id))
     return user
+
+
+# TODO generate new member with admin roots
+def generate_member(member: Users) -> schemas.TokenData:
+    """Member with admin status and ID"""
+    return schemas.TokenData(current_user=member.id, is_admin=member.is_admin)

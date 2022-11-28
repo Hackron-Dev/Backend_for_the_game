@@ -15,3 +15,7 @@ def verify(plain_password, hashed_password):
 
 def get_user(user_id: int) -> Users:
     return User_Pydantic.from_queryset_single(Users.get(id=user_id))
+
+
+def make_member_blank() -> Users:
+    return Users

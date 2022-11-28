@@ -10,10 +10,6 @@ from app.schemas import UserOut, Token
 router = APIRouter(
     tags=['Auth']
 )
-user_router = APIRouter(
-    tags=['Auth'],
-    dependencies=[Depends(oauth2.JWTBearer())]
-)
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)  # Create user
@@ -36,8 +32,3 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
 
     access_token = oauth2.create_token(data={"current_user": users.id})
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@user_router.get("/admin")
-async def root():
-    return "You are admin"
