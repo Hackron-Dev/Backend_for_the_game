@@ -16,6 +16,7 @@ router = APIRouter(
 
 @router.get("/admin")
 async def admin_check() -> Response:
+    """Check if the authenticated member is an admin."""
     return Response("You're an admin!")
 
 
@@ -24,7 +25,7 @@ async def get_member(id: int):
     return await User_Pydantic.from_queryset_single(Users.get(id=id))
 
 
-@router.post("/users/", response_model=UserOut)
+@router.post("/users", response_model=UserOut)
 async def add_user(user: UserIn_Pydantic, is_admin: bool = False):
     """Create a new member."""
     user.password = jwt_utils.hash_(user.passowrd)

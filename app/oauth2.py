@@ -27,7 +27,7 @@ class AuthState(Enum):
     NEEDS_ADMIN = "This endpoint is limited to admins."
 
 
-async def validate_token(token: Optional[str], needs_admin: bool = False) -> tuple[schemas.TokenData, Users]:
+def validate_token(token: Optional[str], needs_admin: bool = False) -> tuple[schemas.TokenData, Users]:
     """Check given token and matches our database"""
     if token is None:
         return HTTPException(status.HTTP_403_FORBIDDEN, AuthState.NO_TOKEN.value)
@@ -39,7 +39,7 @@ async def validate_token(token: Optional[str], needs_admin: bool = False) -> tup
 
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    if needs_admin and not member:
+    if needs_admin and not member[1]:
         return HTTPException(403, AuthState.NEEDS_ADMIN.value)
 
     return token_data, member
