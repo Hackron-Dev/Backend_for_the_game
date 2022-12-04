@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from typing import Optional, cast
 from enum import Enum
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app import schemas
 from app.utils import jwt_utils
 from app.utils.constants import Server
@@ -27,7 +29,12 @@ class AuthState(Enum):
     NEEDS_ADMIN = "This endpoint is limited to admins."
 
 
-def validate_token(token: Optional[str], needs_admin: bool = False) -> tuple[schemas.TokenData, Users]:
+async def validate_token(
+        db_session: AsyncSession,
+        token: Optional[str],
+        *,
+        needs_admin: bool = False
+) -> tuple[schemas.TokenData, Users]:
     """Check given token and matches our database"""
     if token is None:
         return HTTPException(status.HTTP_403_FORBIDDEN, AuthState.NO_TOKEN.value)
@@ -35,17 +42,16 @@ def validate_token(token: Optional[str], needs_admin: bool = False) -> tuple[sch
         token_data = cast(schemas.TokenData, jwt.decode(token, Server.SECRET_KEY, algorithms=[Server.ALGORITHM]))
     except JWTError:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    member = get_user(int(token_data["current_user"]))
-
+    member = await get_user(db_session, int(token_data["current_user"]))
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    if needs_admin and not member[1]:
+    if needs_admin and not member.is_admin:
         return HTTPException(403, AuthState.NEEDS_ADMIN.value)
 
     return token_data, member
 
 
-class JWTBearer(HTTPBasic):
+class JWTBearer(HTTPBearer):
     """Dependency for routes to enforce JWT auth."""
 
     def __init__(self, auto_error: bool = True, require_admin: bool = False):
@@ -56,11 +62,12 @@ class JWTBearer(HTTPBasic):
         """Check if the supplied credentials are valid for this endpoint."""
         credentials = cast(HTTPAuthorizationCredentials, await super().__call__(request))
         jwt_token = credentials.credentials
-        _, member = await validate_token(jwt_token, needs_admin=self.require_admin)
-
+        db_session = request.state.db_session
+        _, member = await validate_token(db_session, jwt_token, needs_admin=self.require_admin)
+        print(member)
         # Token is valid, store the member_id and is_admin data into the request
-        request.state.member = member
-        request.state.is_admin = member
+        request.state.id = member.id
+        request.state.is_admin = member.is_admin
         return credentials
 
 

@@ -1,7 +1,8 @@
+from app import models, schemas
 from passlib.context import CryptContext
-from app.models import Users, User_Pydantic
 
-from ._db import cur
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Hashing algorithm
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -15,13 +16,12 @@ def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_user(session: cur, user_id: int) -> Users:
-    stmt = User_Pydantic.from_queryset_single(Users.get(id=user_id))
-    print(stmt)
-    cur.execute(f"SELECT id, is_admin from USERS WHERE id={user_id}")
-    user = cur.fetchone()
-    return user
+async def get_user(session: AsyncSession, user_id: int) -> models.Users:
+    stmt = select(models.Users).filter(models.Users.id == user_id)
+    r = await session.execute(stmt)
+    db_model = r.scalars().first()
+    return db_model
 
 
-def make_member_blank() -> Users:
-    return Users
+def make_member_blank() -> models.Users:
+    return models.Users
