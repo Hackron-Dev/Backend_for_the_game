@@ -15,9 +15,12 @@ def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_user(user_id: int):
-    user = cur.execute(f"SELECT id, is_admin from USERS WHERE id={user_id}")
-    return list(user)
+def get_user(session: cur, user_id: int) -> Users:
+    stmt = User_Pydantic.from_queryset_single(Users.get(id=user_id))
+    print(stmt)
+    cur.execute(f"SELECT id, is_admin from USERS WHERE id={user_id}")
+    user = cur.fetchone()
+    return user
 
 
 def make_member_blank() -> Users:

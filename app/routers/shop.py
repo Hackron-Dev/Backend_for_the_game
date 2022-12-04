@@ -14,7 +14,7 @@ class Status(BaseModel):  # Status msg for errors
 
 
 # Get all items from shop
-@router.get("/")
+@router.get("")
 async def get_items():
     return await Shop_Pydantic.from_queryset(Shop.all())
 
@@ -25,7 +25,7 @@ async def get_item_by_id(product_id: int):
     return await Shop_Pydantic.from_queryset_single(Shop.get(id=product_id))
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Shop_Pydantic)  # Not copy-paste Create shop
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=Shop_Pydantic)  # Not copy-paste Create shop
 async def create_product(product: ShopIn_Pydantic):
     product_obj = await Shop.create(**product.dict())  # чтобы добавить брать входные данные и добавлять в бд
     return await Shop_Pydantic.from_tortoise_orm(product_obj)  # вернуть введенные данные

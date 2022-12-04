@@ -8,7 +8,3 @@ con = psycopg2.connect(
     port="5432"
 )
 cur = con.cursor()
-
-
-def get_user(id: int):
-    cur.execute()

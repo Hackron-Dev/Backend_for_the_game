@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Depends, status, Request
-from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer, HTTPBasic
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Optional, cast
@@ -45,7 +45,7 @@ def validate_token(token: Optional[str], needs_admin: bool = False) -> tuple[sch
     return token_data, member
 
 
-class JWTBearer(HTTPBearer):
+class JWTBearer(HTTPBasic):
     """Dependency for routes to enforce JWT auth."""
 
     def __init__(self, auto_error: bool = True, require_admin: bool = False):
