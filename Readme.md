@@ -5,7 +5,7 @@
 > pip install -r requirements.txt
 ```
 
-Create `.evn` File and ADD `DATABASE_URL`, `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `ALGORITHM` 
+Create `.evn` file and add `DATABASE_URL` `SECRET_KEY` `ACCESS_TOKEN_EXPIRE_MINUTES` `ALGORITHM` 
 
 Mask
 
@@ -21,25 +21,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60 # how many do you wont use token
 ALGORITHM="HS256" # Use this by default
 ```
 
-for run use Pycharm or with command on terminal
+You can run using Pycharm config or with command on terminal
 ```shell
-> uvicorn app.main:app --host=localhost --port=8080
+uvicorn app.main:app --host=localhost --port=8080
 ```
 
 # Migration with `aerich`
 Inti DB for starting migrations
 ```shell
-> aerich init-db
+aerich init-db
 ```
 For migrating changes
 ```shell
-> aerich migrate --name TEXT  Migrate name.  [default: update]
+aerich migrate --name TEXT  Migrate name.  [default: update]
 ```
 Upgrade to specified version.
 ```shell
-> aerich upgrade
+aerich upgrade
 ```
 # Project Contributors
 <a href="https://github.com/Hackron-Dev/Backend_for_the_game/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=Hackron-dev/Backend_for_the_game">
+  <img src="https://contrib.rocks/image?repo=Hackron-Dev/Backend_for_the_game" alt="Azamtoiri"/>
+  <img src="https://avatars.githubusercontent.com/u/58049877?s=60&v=4" alt="Hackron-Dev" />
 </a>
