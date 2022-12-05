@@ -41,6 +41,5 @@ aerich upgrade
 ```
 # Project Contributors
 <a href="https://github.com/Hackron-Dev/Backend_for_the_game/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Hackron-Dev/Backend_for_the_game" alt="Azamtoiri"/>
-  <img src="https://avatars.githubusercontent.com/u/58049877?s=60&v=4" alt="Hackron-Dev" />
+  <img src="https://contrib.rocks/image?repo=Hackron-Dev/Backend_for_the_game"/>
 </a>
