@@ -40,3 +40,4 @@ class Shop(Model):
 # Pydantic schemas created automatically by [Copilot]
 Shop_Pydantic = pydantic_model_creator(Shop, name="Shop")
 ShopIn_Pydantic = pydantic_model_creator(Shop, name="ShopIn", exclude_readonly=True)
+# TODO Foreign Key for raw user doens work do this

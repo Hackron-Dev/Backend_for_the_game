@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 
 from app import oauth2, schemas
+from app.oauth2 import get_current_user
 from app.models import Shop, Shop_Pydantic, ShopIn_Pydantic
 
 router = APIRouter(
@@ -23,7 +24,8 @@ async def get_item_by_id(product_id: int):
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Shop_Pydantic)  # Not copy-paste Create shop
-async def create_product(product: ShopIn_Pydantic):
+async def create_product(product: ShopIn_Pydantic, user_id: int = Depends(get_current_user)):
+    print(product)
     product_obj = await Shop.create(**product.dict())  # чтобы добавить брать входные данные и добавлять в бд
     return await Shop_Pydantic.from_tortoise_orm(product_obj)  # вернуть введенные данные
 

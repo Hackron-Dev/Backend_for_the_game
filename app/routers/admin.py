@@ -28,7 +28,7 @@ async def get_member(id: int):
 @router.post("/member", response_model=UserOut)
 async def add_user(user: UserIn_Pydantic, is_admin: bool = False):
     """Create a new member."""
-    user.password = jwt_utils.hash_(user.passowrd)
+    user.password = jwt_utils.hash_(user.password)
     user.is_admin = is_admin
     try:
         user_obj = await Users.create(**user.dict())
