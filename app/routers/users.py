@@ -1,11 +1,11 @@
+import tortoise
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from app.models import Users, User_Pydantic, UserIn_Pydantic
+from app import oauth2, schemas
 from app.utils import jwt_utils
-from app.schemas import UserOut, Status
-from app import oauth2
+from app.models import Users, User_Pydantic
 
 router = APIRouter(
     tags=["Users"],
@@ -18,13 +18,13 @@ user_router = APIRouter(
 )
 
 
-@router.get("", response_model=List[UserOut])  # Get All users
+@router.get("", response_model=List[schemas.UserOut])  # Get All users
 async def get_users():
     user = await User_Pydantic.from_queryset(Users.all())
     return user
 
 
-@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=UserOut)  # Get user by id
+@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)  # Get form_data by id
 async def get_user_by_id(user_id: int):
     user = await User_Pydantic.from_queryset_single(Users.get(id=user_id))
     if user is None:
@@ -32,17 +32,28 @@ async def get_user_by_id(user_id: int):
     return user
 
 
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)  # Create form_data
+async def create_user(user: schemas.CreateSimpleUser):
+    user.password = jwt_utils.hash_(user.password)  # hashing password
+    try:
+        user_obj = await Users.create(**user.dict())
+    except tortoise.exceptions.OperationalError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User with this login already exist")
+    return await User_Pydantic.from_tortoise_orm(user_obj)
+
+
 @user_router.put("/{user_id}", status_code=status.HTTP_426_UPGRADE_REQUIRED,
-                 response_model=User_Pydantic)  # Update user
-async def update_user(user_id: int, user: UserIn_Pydantic):
-    user.password = jwt_utils.hash_(user.password)
+                 response_model=schemas.UserOut)  # Update form_data
+async def update_user(user_id: int, user: schemas.UpdateUser):
     await Users.filter(id=user_id).update(**user.dict())
     return await User_Pydantic.from_queryset_single(Users.get(id=user_id))
 
 
-@user_router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=Status)  # Delete user
+@user_router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=schemas.Status)  # Delete form_data
 async def delete_user(user_id: int):
     deleted_count = await Users.filter(id=user_id).delete()
     if not deleted_count:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return Status(message=f"Deleted user {user_id}")
+    return schemas.Status(message=f"Deleted form_data {user_id}")
+
+# TODO сделать так чтобы админ мог удалять кого хочет, а не админ могу удалить только свой аккаунт

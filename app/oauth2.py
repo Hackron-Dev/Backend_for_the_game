@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 from typing import Optional, cast
 from enum import Enum
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app import schemas
 from app.utils import jwt_utils
 from app.utils.constants import Server
@@ -41,8 +39,9 @@ async def validate_token(
         token_data = cast(schemas.TokenData, jwt.decode(token, Server.SECRET_KEY, algorithms=[Server.ALGORITHM]))
     except JWTError:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    member = await Users.get(int(token_data["current_user"]))
-    print(member)
+    member = await jwt_utils.get_user(int(token_data['current_user']))
+    print("User", member)
+    print("User", token_data)
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
     if needs_admin and not member.is_admin:
@@ -62,7 +61,19 @@ class JWTBearer(HTTPBearer):
         """Check if the supplied credentials are valid for this endpoint."""
         credentials = cast(HTTPAuthorizationCredentials, await super().__call__(request))
         jwt_token = credentials.credentials
-        _, member = await validate_token(jwt_token, needs_admin=self.require_admin)
+        if not jwt_token:
+            raise HTTPException(403, AuthState.NO_TOKEN.value)
+
+        try:
+            token_data = jwt.decode(jwt_token, Server.SECRET_KEY)
+        except JWTError:
+            raise HTTPException(403, AuthState.INVALID_TOKEN.value)
+        member = await get_user(token_data["current_user"])
+        if member is None:
+            raise HTTPException(403, AuthState.INVALID_TOKEN.value)
+        if self.require_admin and not member.is_admin:
+            raise HTTPException(403, AuthState.NEEDS_ADMIN.value)
+
         # Token is valid, store the member_id and is_admin data into the request
         request.state.id = member.id
         request.state.is_admin = member.is_admin
@@ -82,7 +93,6 @@ def create_token(data: dict):
 
 def verify_access_token(token: str, credentials_exception):
     try:
-
         payload = jwt.decode(token, Server.SECRET_KEY, algorithms=[Server.ALGORITHM])
         id: str = payload.get("current_user")
         if id is None:
@@ -107,3 +117,14 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 def generate_member(member: Users) -> schemas.TokenData:
     """Member with admin status and ID"""
     return schemas.TokenData(current_user=member.id, is_admin=member.is_admin)
+
+
+async def authenticate_user(login: str, password: str) -> Users:
+    user = await Users.get(login=login)
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
+    if not user.verify_password(password):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
+
+    return user

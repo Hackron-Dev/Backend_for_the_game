@@ -20,12 +20,12 @@ async def admin_check() -> Response:
     return Response("You're an admin!")
 
 
-@router.get("/users/{id}", response_model=UserOut)
+@router.get("/member/{id}", response_model=UserOut)
 async def get_member(id: int):
     return await User_Pydantic.from_queryset_single(Users.get(id=id))
 
 
-@router.post("/users", response_model=UserOut)
+@router.post("/member", response_model=UserOut)
 async def add_user(user: UserIn_Pydantic, is_admin: bool = False):
     """Create a new member."""
     user.password = jwt_utils.hash_(user.passowrd)
@@ -36,4 +36,4 @@ async def add_user(user: UserIn_Pydantic, is_admin: bool = False):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User with this login already exist")
     return await User_Pydantic.from_tortoise_orm(user_obj)
 
-# TODO user router.patch and learn what is it
+# TODO form_data router.patch and learn what is it

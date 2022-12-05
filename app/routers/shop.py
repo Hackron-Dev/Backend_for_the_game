@@ -1,16 +1,13 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Depends, status
 
+from app import oauth2, schemas
 from app.models import Shop, Shop_Pydantic, ShopIn_Pydantic
-from pydantic import BaseModel
 
 router = APIRouter(
     tags=["Shop"],
-    prefix="/shop"
+    prefix="/shop",
+    dependencies=[Depends(oauth2.JWTBearer())]
 )
-
-
-class Status(BaseModel):  # Status msg for errors
-    message: str
 
 
 # Get all items from shop
@@ -31,9 +28,9 @@ async def create_product(product: ShopIn_Pydantic):
     return await Shop_Pydantic.from_tortoise_orm(product_obj)  # вернуть введенные данные
 
 
-@router.delete("/{product_id}", status_code=status.HTTP_410_GONE, response_model=Status)  # Delete product
+@router.delete("/{product_id}", status_code=status.HTTP_410_GONE, response_model=schemas.Status)  # Delete product
 async def delete_product(product_id: int):
     deleted_count = await Shop.filter(id=product_id).delete()
     if not deleted_count:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
-    return Status(message=f"Deleted product {product_id}")
+    return schemas.Status(message=f"Deleted product {product_id}")

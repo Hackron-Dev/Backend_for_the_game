@@ -1,6 +1,9 @@
+from passlib.hash import bcrypt
 from tortoise import fields
 from tortoise.models import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
+
+from app.utils import jwt_utils
 
 
 class Users(Model):
@@ -12,12 +15,8 @@ class Users(Model):
     balance = fields.IntField(null=False, default=0)
     is_admin = fields.BooleanField(null=False, default=False)
 
-    @classmethod
-    async def get_user(cls, login):
-        return cls.get(login=login)
-
     def verify_password(self, password):
-        return True
+        return bcrypt.verify(password, self.password)
 
 
 # Pydantic schemas creating automatically by Tortoise

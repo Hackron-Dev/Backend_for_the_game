@@ -10,10 +10,21 @@ class Status(BaseModel):  # Status msg for errors
 class UserOut(BaseModel):
     id: int
     login: str
-    balance: str
+    balance: int
+    is_admin: bool
 
     class Config:
         orm_mode = True
+
+
+class CreateSimpleUser(BaseModel):
+    login: str
+    password: str
+    balance: int
+
+
+class UpdateUser(BaseModel):
+    balance: int
 
 
 class Token(BaseModel):
