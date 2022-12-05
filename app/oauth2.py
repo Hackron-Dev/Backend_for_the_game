@@ -30,7 +30,6 @@ class AuthState(Enum):
 
 
 async def validate_token(
-        db_session: AsyncSession,
         token: Optional[str],
         *,
         needs_admin: bool = False
@@ -42,7 +41,8 @@ async def validate_token(
         token_data = cast(schemas.TokenData, jwt.decode(token, Server.SECRET_KEY, algorithms=[Server.ALGORITHM]))
     except JWTError:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-    member = await get_user(db_session, int(token_data["current_user"]))
+    member = await Users.get(int(token_data["current_user"]))
+    print(member)
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
     if needs_admin and not member.is_admin:
@@ -62,9 +62,7 @@ class JWTBearer(HTTPBearer):
         """Check if the supplied credentials are valid for this endpoint."""
         credentials = cast(HTTPAuthorizationCredentials, await super().__call__(request))
         jwt_token = credentials.credentials
-        db_session = request.state.db_session
-        _, member = await validate_token(db_session, jwt_token, needs_admin=self.require_admin)
-        print(member)
+        _, member = await validate_token(jwt_token, needs_admin=self.require_admin)
         # Token is valid, store the member_id and is_admin data into the request
         request.state.id = member.id
         request.state.is_admin = member.is_admin

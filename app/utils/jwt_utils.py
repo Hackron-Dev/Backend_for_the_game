@@ -1,4 +1,4 @@
-from app import models, schemas
+from app import models
 from passlib.context import CryptContext
 
 from sqlalchemy.future import select

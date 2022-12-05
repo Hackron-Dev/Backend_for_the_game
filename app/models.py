@@ -12,13 +12,20 @@ class Users(Model):
     balance = fields.IntField(null=False, default=0)
     is_admin = fields.BooleanField(null=False, default=False)
 
+    @classmethod
+    async def get_user(cls, login):
+        return cls.get(login=login)
+
+    def verify_password(self, password):
+        return True
+
 
 # Pydantic schemas creating automatically by Tortoise
 User_Pydantic = pydantic_model_creator(Users, name="User")
 UserIn_Pydantic = pydantic_model_creator(Users, name="UserIn", exclude_readonly=True)
 
 
-# Class for the shop (9:36) TODO create foreign key for shop to users
+# Class for the shop (9:36)
 class Shop(Model):
     """Shops Model"""
 
