@@ -1,5 +1,6 @@
 from fastapi import HTTPException, Depends, status, Request
 from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer, HTTPBasic
+
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Optional, cast
@@ -8,7 +9,6 @@ from enum import Enum
 from app import schemas
 from app.utils import jwt_utils
 from app.utils.constants import Server
-from app.utils.jwt_utils import get_user
 from app.models import User_Pydantic, Users
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -40,12 +40,11 @@ async def validate_token(
     except JWTError:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
     member = await jwt_utils.get_user(int(token_data['current_user']))
-    print("User", member)
-    print("User", token_data)
+
     if member is None:
         raise HTTPException(403, AuthState.INVALID_TOKEN.value)
     if needs_admin and not member.is_admin:
-        return HTTPException(403, AuthState.NEEDS_ADMIN.value)
+        raise HTTPException(403, AuthState.NEEDS_ADMIN.value)
 
     return token_data, member
 
@@ -61,18 +60,8 @@ class JWTBearer(HTTPBearer):
         """Check if the supplied credentials are valid for this endpoint."""
         credentials = cast(HTTPAuthorizationCredentials, await super().__call__(request))
         jwt_token = credentials.credentials
-        if not jwt_token:
-            raise HTTPException(403, AuthState.NO_TOKEN.value)
 
-        try:
-            token_data = jwt.decode(jwt_token, Server.SECRET_KEY)
-        except JWTError:
-            raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-        member = await get_user(token_data["current_user"])
-        if member is None:
-            raise HTTPException(403, AuthState.INVALID_TOKEN.value)
-        if self.require_admin and not member.is_admin:
-            raise HTTPException(403, AuthState.NEEDS_ADMIN.value)
+        _, member = await validate_token(jwt_token, needs_admin=self.require_admin)
 
         # Token is valid, store the member_id and is_admin data into the request
         request.state.id = member.id
