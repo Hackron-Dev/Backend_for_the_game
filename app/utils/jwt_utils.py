@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 from app import models
 from passlib.context import CryptContext
 
