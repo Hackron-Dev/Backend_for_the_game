@@ -103,8 +103,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 # TODO generate new member with admin roots
-def generate_member(member: Users) -> schemas.TokenData:
+async def generate_member(member: Users) -> schemas.TokenData:
     """Member with admin status and ID"""
+    new_user = await jwt_utils.make_member_blank()  # not yet
     return schemas.TokenData(current_user=member.id, is_admin=member.is_admin)
 
 
