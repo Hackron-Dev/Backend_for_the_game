@@ -18,8 +18,9 @@ CREATE TABLE IF NOT EXISTS "shop" (
     "price" INT NOT NULL,
     "image" VARCHAR(200),
     "quantity" INT,
-    "user_id_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+    "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
 );
+COMMENT ON TABLE "shop" IS 'Shops Model';
 CREATE TABLE IF NOT EXISTS "aerich" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "version" VARCHAR(255) NOT NULL,
