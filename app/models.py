@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from passlib.hash import bcrypt
 from tortoise import fields
 from tortoise.models import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
 
-from app.utils import jwt_utils
+now = datetime.now()
 
 
 class Users(Model):
@@ -13,7 +15,7 @@ class Users(Model):
     login = fields.CharField(max_length=50, null=False, unique=True)
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
-    created_at = fields.DateField(auto_now=True)
+    created_at = fields.DatetimeField(default=datetime.utcnow)
     is_admin = fields.BooleanField(null=False, default=False)
 
     def verify_password(self, password):
@@ -41,4 +43,5 @@ class Shop(Model):
 # Pydantic schemas created automatically by [Copilot]
 Shop_Pydantic = pydantic_model_creator(Shop, name="Shop")
 ShopIn_Pydantic = pydantic_model_creator(Shop, name="ShopIn", exclude_readonly=True)
+
 # TODO Foreign Key for raw user doens work do this
