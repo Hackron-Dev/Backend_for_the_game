@@ -15,7 +15,6 @@ class Users(Model):
     login = fields.CharField(max_length=50, null=False, unique=True)
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
-    created_at = fields.DatetimeField(default=datetime.utcnow)
     is_admin = fields.BooleanField(null=False, default=False)
 
     def verify_password(self, password):
