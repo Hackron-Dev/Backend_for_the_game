@@ -50,7 +50,7 @@ async def update_user(user_id: int, user: schemas.UpdateUser):
 
 @user_router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=schemas.Status)  # Delete form_data
 async def delete_user(user_id: int):
-    deleted_count = await Users.filter(id=user_id).delete()
+    deleted_count = await Users.filter(id=user_id, is_admin=False).delete()
     if not deleted_count:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return schemas.Status(message=f"Deleted form_data {user_id}")

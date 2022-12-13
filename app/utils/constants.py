@@ -47,6 +47,14 @@ def _get_config(
     return obj
 
 
+class Logging:
+    """Logging related configuration"""
+
+    DEBUG = _get_config("DEBUG", cast=bool, default=False)
+    LOG_FILE = _get_config("LOG_FILE", default=None)
+    MAX_FILE_SIZE = _get_config("LOG_FILE_MAX_SIZE", cast=int, default=-1)
+
+
 class Connection:
     DATABASE_URL = _str_config("DATABASE_URL")
 
@@ -55,11 +63,4 @@ class Server:
     SECRET_KEY = _str_config("SECRET_KEY")
     ALGORITHM = _str_config("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES = _int_config("ACCESS_TOKEN_EXPIRE_MINUTES")
-
-
-class Logging:
-    """Logging related configuration"""
-
-    DEBUG = _get_config("DEBUG", cast=bool, default=False)
-    LOG_FILE = _get_config("LOG_FILE", default=None)
-    MAX_FILE_SIZE = _get_config("LOG_FILE_MAX_SIZE", cast=int, default=-1)
+    SHOW_ADMIN_ENDPOINTS = Logging.DEBUG

@@ -7,7 +7,7 @@ from app.models import Shop, Shop_Pydantic, ShopIn_Pydantic
 router = APIRouter(
     tags=["Shop"],
     prefix="/shop",
-    dependencies=[Depends(oauth2.JWTBearer())]
+    dependencies=[Depends(oauth2.JWTBearer()), Depends(oauth2.oauth2_scheme)]
 )
 
 

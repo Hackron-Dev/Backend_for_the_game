@@ -8,9 +8,11 @@ from app.oauth2 import JWTBearer, oauth2_scheme
 from app.models import Users, User_Pydantic, UserIn_Pydantic
 from app.schemas import UserOut
 from app.utils import jwt_utils
+from app.utils.constants import Server
 
 router = APIRouter(
     tags=["Admin-only endpoints"],
+    include_in_schema=Server.SHOW_ADMIN_ENDPOINTS,
     dependencies=[Depends(JWTBearer(require_admin=True)), Depends(oauth2_scheme)],
 )
 

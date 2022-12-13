@@ -45,3 +45,5 @@ class ShopIn(BaseModel):
 
     class Config:
         orm_mode = True
+
+# TODO Сделать красиво, почистить и упорядочить
