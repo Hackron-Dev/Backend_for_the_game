@@ -36,7 +36,7 @@ class Shop(Model):
     description = fields.CharField(max_length=200, null=True)
     price = fields.IntField(null=False)
     image = fields.CharField(max_length=200, null=True)
-    quantity = fields.IntField(null=True)  # quantity of product
+    quantity = fields.IntField(null=True, default=0)  # quantity of product
 
 
 # Pydantic schemas created automatically by [Copilot]

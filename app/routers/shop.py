@@ -19,14 +19,18 @@ async def get_items():
 
 # Get item by id
 @router.get("/{product_id}")
-async def get_item_by_id(product_id: int):
-    return await Shop_Pydantic.from_queryset_single(Shop.get(id=product_id))
+async def get_item_by_id(product_id: int, user_id: int = Depends(get_current_user)):
+    try:
+        shop_obj = await Shop_Pydantic.from_queryset_single(Shop.get(id=product_id, user=user_id))
+    except:
+        raise HTTPException(404, detail="NOT FOUND")
+    return await shop_obj
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Shop_Pydantic)  # Not copy-paste Create shop
 async def create_product(product: ShopIn_Pydantic, user_id: int = Depends(get_current_user)):
-    print(product)
-    product_obj = await Shop.create(**product.dict())  # чтобы добавить брать входные данные и добавлять в бд
+    product_obj = await Shop.create(user=user_id,
+                                    **product.dict())  # чтобы добавить брать входные данные и добавлять в бд
     return await Shop_Pydantic.from_tortoise_orm(product_obj)  # вернуть введенные данные
 
 

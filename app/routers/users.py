@@ -33,7 +33,7 @@ async def get_user_by_id(user_id: int):
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)  # Create form_data
-async def create_user(user: schemas.CreateSimpleUser):
+async def create_user(user: schemas.SimpleUser):
     user.password = jwt_utils.hash_(user.password)  # hashing password
     try:
         user_obj = await Users.create(**user.dict())

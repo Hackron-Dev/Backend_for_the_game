@@ -17,10 +17,9 @@ class UserOut(BaseModel):
         orm_mode = True
 
 
-class CreateSimpleUser(BaseModel):
+class SimpleUser(BaseModel):
     login: str
     password: str
-    balance: int
 
 
 class UpdateUser(BaseModel):
@@ -34,3 +33,15 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+
+class ShopIn(BaseModel):
+    user_id: int
+    name: str
+    description: str
+    price: int
+    image: str
+    quantity: int
+
+    class Config:
+        orm_mode = True
