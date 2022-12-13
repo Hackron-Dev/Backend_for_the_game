@@ -1,16 +1,17 @@
-# Only admin router
+from typing import List
+
 import tortoise
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import Response
 
-from app.oauth2 import JWTBearer
+from app.oauth2 import JWTBearer, oauth2_scheme
 from app.models import Users, User_Pydantic, UserIn_Pydantic
 from app.schemas import UserOut
 from app.utils import jwt_utils
 
 router = APIRouter(
     tags=["Admin-only endpoints"],
-    dependencies=[Depends(JWTBearer(require_admin=True))],
+    dependencies=[Depends(JWTBearer(require_admin=True)), Depends(oauth2_scheme)],
 )
 
 
@@ -18,6 +19,12 @@ router = APIRouter(
 async def admin_check() -> Response:
     """Check if the authenticated member is an admin."""
     return Response("You're an admin!")
+
+
+@router.get("/member", response_model=List[UserOut])
+async def get_admin():
+    user = await User_Pydantic.from_queryset(Users.all())
+    return user
 
 
 @router.get("/member/{id}", response_model=UserOut)

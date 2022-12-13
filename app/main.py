@@ -1,14 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, Response
 
-from app.routers import users, shop, auth, admin
+from app.routers import users, auth, admin
 from app.db.database import init_db
 
-app = FastAPI(title="Using Tortoise")
+app = FastAPI(title="Backend For Game")
 
 app.include_router(users.router)
-app.include_router(users.user_router)
-app.include_router(shop.router)
 app.include_router(auth.router)
 app.include_router(admin.router)
 

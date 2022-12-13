@@ -12,15 +12,14 @@ router = APIRouter(
     prefix="/users"
 )
 user_router = APIRouter(
-    tags=["Users"],
     prefix="/users",
-    dependencies=[Depends(oauth2.JWTBearer())]
+    dependencies=[Depends(oauth2.oauth2_scheme), Depends(oauth2.JWTBearer)]
 )
 
 
 @router.get("", response_model=List[schemas.UserOut])  # Get All users
 async def get_users():
-    user = await User_Pydantic.from_queryset(Users.all())
+    user = await User_Pydantic.from_queryset(Users.filter(is_admin=False).all())
     return user
 
 
@@ -56,4 +55,6 @@ async def delete_user(user_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return schemas.Status(message=f"Deleted form_data {user_id}")
 
+
+router.include_router(user_router)
 # TODO сделать так чтобы админ мог удалять кого хочет, а не админ могу удалить только свой аккаунт
