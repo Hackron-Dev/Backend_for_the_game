@@ -25,13 +25,25 @@ async def admin_check() -> Response:
 
 @router.get("/member", response_model=List[UserOut])
 async def get_admin():
-    user = await User_Pydantic.from_queryset(Users.all())
-    return user
+    return await User_Pydantic.from_queryset(Users.all())
 
 
 @router.get("/member/{id}", response_model=UserOut)
 async def get_member(id: int):
-    return await User_Pydantic.from_queryset_single(Users.get(id=id))
+    try:
+        user = User_Pydantic.from_queryset_single(Users.get(id=id))
+    except tortoise.exceptions.OperationalError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {id} not found")
+    return user
+
+
+@router.get("/member/login/{login}", response_model=UserOut)
+async def get_member(login: str):
+    try:
+        user = await User_Pydantic.from_queryset_single(Users.get(login=login))
+    except tortoise.exceptions.OperationalError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with login \"{login}\" not found")
+    return user
 
 
 @router.post("/member", response_model=UserOut)

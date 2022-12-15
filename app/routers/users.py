@@ -25,9 +25,19 @@ async def get_users():
 
 @router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)  # Get form_data by id
 async def get_user_by_id(user_id: int):
-    user = await User_Pydantic.from_queryset_single(Users.get(id=user_id))
-    if user is None:
+    try:
+        user = await User_Pydantic.from_queryset_single(Users.get(id=user_id))
+    except tortoise.exceptions.OperationalError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found")
+    return user
+
+
+@router.get("/login/{login}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
+async def get_user_by_login(login: str):
+    try:
+        user = await User_Pydantic.from_queryset_single(Users.get(login=login, is_admin=False))
+    except tortoise.exceptions.OperationalError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with login {login} not found")
     return user
 
 
@@ -48,7 +58,7 @@ async def update_user(user_id: int, user: schemas.UpdateUser):
     return await User_Pydantic.from_queryset_single(Users.get(id=user_id))
 
 
-@user_router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=schemas.Status)  # Delete form_data
+@user_router.delete("/{user_id}", status_code=status.HTTP_410_GONE, response_model=schemas.Status)
 async def delete_user(user_id: int):
     deleted_count = await Users.filter(id=user_id, is_admin=False).delete()
     if not deleted_count:
@@ -58,3 +68,4 @@ async def delete_user(user_id: int):
 
 router.include_router(user_router)
 # TODO сделать так чтобы админ мог удалять кого хочет, а не админ могу удалить только свой аккаунт
+# TODO try: except for `put` and `delete`
