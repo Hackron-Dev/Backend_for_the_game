@@ -11,10 +11,7 @@ router = APIRouter(
     tags=["Users"],
     prefix="/users"
 )
-user_router = APIRouter(
-    prefix="/users",
-    dependencies=[Depends(oauth2.oauth2_scheme), Depends(oauth2.JWTBearer)]
-)
+user_router = APIRouter(dependencies=[Depends(oauth2.oauth2_scheme), Depends(oauth2.JWTBearer)])
 
 
 @router.get("", response_model=List[schemas.UserOut])  # Get All users
