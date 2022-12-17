@@ -11,16 +11,16 @@ router = APIRouter(
     tags=["Users"],
     prefix="/users"
 )
-user_router = APIRouter(dependencies=[Depends(oauth2.oauth2_scheme), Depends(oauth2.JWTBearer)])
+user_router = APIRouter(dependencies=[Depends(oauth2.JWTBearer), Depends(oauth2.oauth2_scheme)])
 
 
-@router.get("", response_model=List[schemas.UserOut])  # Get All users
+@router.get("", response_model=List[schemas.UserOut])
 async def get_users():
     user = await User_Pydantic.from_queryset(Users.filter(is_admin=False).all())
     return user
 
 
-@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)  # Get form_data by id
+@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
 async def get_user_by_id(user_id: int):
     try:
         user = await User_Pydantic.from_queryset_single(Users.get(id=user_id))
@@ -38,7 +38,7 @@ async def get_user_by_login(login: str):
     return user
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)  # Create form_data
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 async def create_user(user: schemas.SimpleUser):
     user.password = jwt_utils.hash_(user.password)  # hashing password
     try:
