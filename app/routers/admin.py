@@ -56,3 +56,5 @@ async def add_user(user: UserIn_Pydantic, is_admin: bool = False):
     except tortoise.exceptions.OperationalError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User with this login already exist")
     return await User_Pydantic.from_tortoise_orm(user_obj)
+
+# TODO create DELETE method for admin

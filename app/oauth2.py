@@ -93,13 +93,13 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exceptions = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                            detail="Could not validate credentials",
                                            headers={"WWW-Authenticate": "Bearer"})
     token = verify_access_token(token, credentials_exceptions)
-    user = User_Pydantic.from_queryset_single(Users.get(id=token.id))
-    return user
+    user = await Users.get(id=token.id)
+    return await User_Pydantic.from_tortoise_orm(user)
 
 
 # TODO generate new member with admin roots
