@@ -43,4 +43,4 @@ class Shop(Model):
 Shop_Pydantic = pydantic_model_creator(Shop, name="Shop")
 ShopIn_Pydantic = pydantic_model_creator(Shop, name="ShopIn", exclude_readonly=True)
 
-# TODO Foreign Key for raw user doens work do this
+# TODO Foreign Key for raw user does not work, do this

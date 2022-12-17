@@ -11,7 +11,7 @@ app.include_router(auth.router)
 app.include_router(admin.router)
 
 
-@app.on_event("startup")  # before starting creating database
+@app.on_event("startup")
 async def startup_event():
     init_db(app)
 
@@ -21,5 +21,4 @@ async def info(request: Request) -> Response:
     # Use 302 (Temporary redirect) to avoid browsers to cache this
     # since the API may at some point actually have some index page
     # rather than just always redirecting to docs page
-    # return Response("hello")
     return RedirectResponse(url="/docs", status_code=302)

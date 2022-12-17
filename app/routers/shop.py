@@ -11,13 +11,11 @@ router = APIRouter(
 )
 
 
-# Get all items from shop
 @router.get("")
 async def get_items():
     return await Shop_Pydantic.from_queryset(Shop.all())
 
 
-# Get item by id
 @router.get("/{product_id}")
 async def get_item_by_id(product_id: int, user_id: int = Depends(get_current_user)):
     try:

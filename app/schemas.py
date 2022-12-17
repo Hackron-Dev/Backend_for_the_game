@@ -3,10 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class Status(BaseModel):  # Status msg for errors
-    message: str
-
-
+# region: User
 class UserOut(BaseModel):
     id: int
     login: str
@@ -17,24 +14,18 @@ class UserOut(BaseModel):
         orm_mode = True
 
 
+class UpdateUser(BaseModel):
+    balance: int
+
+
 class SimpleUser(BaseModel):
     login: str
     password: str
 
 
-class UpdateUser(BaseModel):
-    balance: int
+# endregion
 
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    id: Optional[str] = None
-
-
+# region: Shop
 class ShopIn(BaseModel):
     user_id: int
     name: str
@@ -46,4 +37,20 @@ class ShopIn(BaseModel):
     class Config:
         orm_mode = True
 
-# TODO Сделать красиво, почистить и упорядочить
+
+# endregion
+
+# region: Token
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[str] = None
+
+
+# endregion
+
+class Status(BaseModel):
+    message: str

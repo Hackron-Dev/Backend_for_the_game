@@ -7,10 +7,7 @@ from app import oauth2, schemas
 from app.utils import jwt_utils
 from app.models import Users, User_Pydantic
 
-router = APIRouter(
-    tags=["Users"],
-    prefix="/users"
-)
+router = APIRouter(tags=["Users"], prefix="/users")
 user_router = APIRouter(dependencies=[Depends(oauth2.oauth2_scheme), Depends(oauth2.JWTBearer)])
 
 
@@ -64,5 +61,3 @@ async def delete_user(user_id: int):
 
 
 router.include_router(user_router)
-# TODO сделать так чтобы админ мог удалять кого хочет, а не админ могу удалить только свой аккаунт
-# TODO try: except for `put` and `delete`
