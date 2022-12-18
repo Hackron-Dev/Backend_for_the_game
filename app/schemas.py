@@ -1,6 +1,7 @@
-from typing import Optional
-
+from typing import Optional, List
 from pydantic import BaseModel
+
+from app.models import Shop_Pydantic
 
 
 class Status(BaseModel):  # Status msg for errors
@@ -12,6 +13,7 @@ class UserOut(BaseModel):
     login: str
     balance: int
     is_admin: bool
+    shop: List[Shop_Pydantic] = None
 
     class Config:
         orm_mode = True
