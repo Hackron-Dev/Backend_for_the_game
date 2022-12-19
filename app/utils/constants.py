@@ -57,6 +57,7 @@ class Logging:
 
 class Connection:
     DATABASE_URL = _str_config("DATABASE_URL")
+    HOST = _str_config("HOST")
 
 
 class Server:
