@@ -7,13 +7,13 @@ from app.models import Shop, Shop_Pydantic, ShopIn_Pydantic, User_Pydantic
 router = APIRouter(
     tags=["Shop"],
     prefix="/shop",
-    dependencies=[Depends(oauth2.JWTBearer()), Depends(oauth2.oauth2_scheme)]
+    # dependencies=[Depends(oauth2.JWTBearer()), Depends(oauth2.oauth2_scheme)]
 )
 
 
 @router.get("")
-async def get_items():
-    return await Shop_Pydantic.from_queryset(Shop.all())
+async def get_items(user: User_Pydantic = Depends(get_current_user)):
+    return await ShopIn_Pydantic.from_queryset(Shop.filter(user_id=user.id, ))
 
 
 @router.get("/{product_id}")

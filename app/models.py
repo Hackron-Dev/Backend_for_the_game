@@ -5,8 +5,6 @@ from tortoise import fields
 from tortoise.models import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
 
-now = datetime.now()
-
 
 class Users(Model):
     """ The User model"""
@@ -16,6 +14,10 @@ class Users(Model):
     password = fields.CharField(max_length=128, null=False)
     balance = fields.IntField(null=False, default=0)
     is_admin = fields.BooleanField(null=False, default=False)
+    shops = fields.ReverseRelation["Shop"]
+
+    class Meta:
+        ordering = ["id"]
 
     def verify_password(self, password):
         return bcrypt.verify(password, self.password)
@@ -31,7 +33,8 @@ class Shop(Model):
     """Shops Model"""
 
     id = fields.IntField(pk=True, unique=True)
-    user = fields.ForeignKeyField('models.Users', related_name='shop')  # user_id in db, relate to User
+    user: fields.ForeignKeyRelation[Users] = fields.ForeignKeyField('models.Users',
+                                                                    related_name='shop')  # user_id in db, relate to User
     name = fields.CharField(max_length=50, null=False)
     description = fields.CharField(max_length=200, null=True)
     price = fields.IntField(null=False)

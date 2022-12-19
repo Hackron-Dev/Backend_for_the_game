@@ -7,16 +7,13 @@ from app import oauth2, schemas
 from app.utils import jwt_utils
 from app.models import Users, User_Pydantic
 
-router = APIRouter(
-    tags=["Users"],
-    prefix="/users"
-)
+router = APIRouter(tags=["Users"], prefix="/users")
 user_router = APIRouter(dependencies=[Depends(oauth2.JWTBearer), Depends(oauth2.oauth2_scheme)])
 
 
 @router.get("", response_model=List[schemas.UserOut])
 async def get_users():
-    user = await User_Pydantic.from_queryset(Users.filter(is_admin=False).all())
+    user = await User_Pydantic.from_queryset(Users.filter(is_admin=False))
     return user
 
 
