@@ -16,6 +16,9 @@ class Users(Model):
     is_admin = fields.BooleanField(null=False, default=False)
     shops = fields.ReverseRelation["Shop"]
 
+    class Meta:
+        ordering = ["id"]
+
     def verify_password(self, password):
         return bcrypt.verify(password, self.password)
 
